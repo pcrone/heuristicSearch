@@ -18,7 +18,7 @@ public class HeuristicSearch {
 	
 	// Helper methods
 	public void run() {
-		
+		runSearch();
 	}
 	
 	private void runSearch() {
@@ -42,7 +42,7 @@ public class HeuristicSearch {
 	}
 	
 	private Stack<Node> findPath() {
-		Stack<Node> path;
+		Stack<Node> path = new Stack<Node>();
 		
 		return path;
 	}
@@ -57,6 +57,8 @@ public class HeuristicSearch {
 		// Constructor
 		public Node(String state) {
 			this.state = state;
+			this.children = new ArrayList<Node>();
+			this.hValues = new int[state.length()];
 			this.cost = 0;
 
 			calculateHofN();
@@ -82,6 +84,10 @@ public class HeuristicSearch {
 		
 		public int getCost() {
 			return cost;
+		}
+		
+		public int getFofN() {
+			return this.cost + getHofN();
 		}
 		
 		public int getHofN() {
@@ -122,11 +128,11 @@ public class HeuristicSearch {
 					continue;
 				
 				// Swap characters
-				newState[indexOfSpace] = state.charAt(i);
-				newState[i] = '_';
+				newState[indexOfSpace] = state.charAt(indexOfSpace + i);
+				newState[indexOfSpace + i] = '_';
 				
 				// Create the new child
-				child = new Node(newState.toString());
+				child = new Node(String.valueOf(newState));
 				
 				// Set child path cost
 				if (Math.abs(i) > 2)
@@ -136,14 +142,19 @@ public class HeuristicSearch {
 				
 				// Add it to the parent	
 				children.add(child);
+				
+				// reset newState
+				newState = state.toCharArray();
 			}
+			
+			hValues = new int[children.size()];
 		}
 
 		@Override
 		public int compareTo(Node arg0) {
-			if (this.cost < arg0.getCost())
+			if (this.getFofN() < arg0.getFofN())
 				return -1;
-			else if (this.cost > arg0.getCost())
+			else if (this.getFofN() > arg0.getFofN())
 				return 1;
 			else
 				return 0;	
@@ -156,5 +167,6 @@ public class HeuristicSearch {
 	
 	public static void main(String[] args) {
 		HeuristicSearch search = new HeuristicSearch("AAABBB_");
+		search.run();
 	}
 }
