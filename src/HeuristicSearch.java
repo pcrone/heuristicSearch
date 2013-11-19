@@ -4,6 +4,7 @@ public class HeuristicSearch {
 	private Node initialState;
 	private ArrayList<Node> explored;
 	private PriorityQueue<Node> queue;
+	private Stack<Node> path;
 	
 	// Constructor
 	public HeuristicSearch(String state) {
@@ -12,13 +13,10 @@ public class HeuristicSearch {
 		queue = new PriorityQueue<Node>();
 	}
 	
-	// Setters
-	
-	// Getters
-	
 	// Helper methods
 	public void run() {
 		runSearch();
+		path = findPath();
 	}
 	
 	private void runSearch() {
@@ -26,9 +24,8 @@ public class HeuristicSearch {
 		ArrayList<Node> currentNodeChildren;
 		queue.add(currentNode);
 		
-		while (currentNode.getHofN() != 0 || !queue.isEmpty()) {
+		while (currentNode.getHofN() != 0 && !queue.isEmpty()) {
 			currentNode = queue.remove();
-			System.out.print(currentNode.getState() + "\n");
 			explored.add(currentNode);
 			
 			currentNode.expand();
@@ -47,14 +44,41 @@ public class HeuristicSearch {
 	}
 	
 	private Stack<Node> findPath() {
+		Node currentNode = explored.get(explored.size() - 1);
 		Stack<Node> path = new Stack<Node>();
 		
+		while (currentNode != null) {
+			path.push(currentNode);
+			currentNode = currentNode.parent;
+		}
+		
 		return path;
+	}
+	
+	public void pathToString() {
+		Node currentNode;
+		int totalCost = 0;
+		
+		while (!path.isEmpty()) {
+			currentNode = path.pop();
+			totalCost += currentNode.getCost();
+			
+			// Output the path
+			System.out.println(currentNode.getState());
+			
+			if (!path.isEmpty()) {
+				System.out.println("   |");
+				System.out.println("   V"); 
+			}
+		}
+		
+		System.out.println("Total cost: " + totalCost);
 	}
 	
 	// Node class
 	private class Node implements Comparable<Node> {
 		private String state;
+		private Node parent;
 		private ArrayList<Node> children;
 		private int hValues[];
 		private int cost;
@@ -62,6 +86,7 @@ public class HeuristicSearch {
 		// Constructor
 		public Node(String state) {
 			this.state = state;
+			this.parent = null;
 			this.children = new ArrayList<Node>();
 			this.hValues = new int[this.state.length()];
 			this.cost = 0;
@@ -145,14 +170,15 @@ public class HeuristicSearch {
 				else
 					child.setCost(1);
 				
+				// Add the parent to the child
+				child.parent = this;
+				
 				// Add it to the parent	
-				children.add(child);
+				children.add(child);				
 				
 				// reset newState
 				newState = state.toCharArray();
 			}
-			
-			hValues = new int[children.size()];
 		}
 
 		@Override
@@ -167,7 +193,6 @@ public class HeuristicSearch {
 
 		@Override
 		public boolean equals(Object arg0) {
-			// TODO Auto-generated method stub
 			if (arg0 instanceof Node) {
 				Node node = (Node)arg0;
 				
@@ -180,6 +205,8 @@ public class HeuristicSearch {
 	
 	public static void main(String[] args) {
 		HeuristicSearch search = new HeuristicSearch("AAABBB_");
+		
 		search.run();
+		search.pathToString();
 	}
 }
