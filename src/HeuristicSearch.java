@@ -28,17 +28,22 @@ public class HeuristicSearch {
 		
 		while (currentNode.getHofN() != 0 || !queue.isEmpty()) {
 			currentNode = queue.remove();
+			System.out.print(currentNode.getState() + "\n");
 			explored.add(currentNode);
 			
 			currentNode.expand();
 			currentNodeChildren = currentNode.getChildren();
 			
 			for (int i = 0; i < currentNodeChildren.size(); i++) {
-				if (explored.contains(currentNodeChildren.get(i)) )
-					continue;
-				queue.add(currentNodeChildren.get(i));
+				if (!explored.contains(currentNodeChildren.get(i)) )
+					queue.add(currentNodeChildren.get(i));
 			}
 		}
+		
+		if (currentNode.getHofN() == 0)
+			System.out.println("Solution found!");
+		else
+			System.out.println("No Solution found!");
 	}
 	
 	private Stack<Node> findPath() {
@@ -58,7 +63,7 @@ public class HeuristicSearch {
 		public Node(String state) {
 			this.state = state;
 			this.children = new ArrayList<Node>();
-			this.hValues = new int[state.length()];
+			this.hValues = new int[this.state.length()];
 			this.cost = 0;
 
 			calculateHofN();
@@ -159,9 +164,17 @@ public class HeuristicSearch {
 			else
 				return 0;	
 		}
-		
-		public boolean equals(Node node) {
-			return state.equals(node.getState());
+
+		@Override
+		public boolean equals(Object arg0) {
+			// TODO Auto-generated method stub
+			if (arg0 instanceof Node) {
+				Node node = (Node)arg0;
+				
+				return (this.getState().equals(node.getState()));
+			}
+				
+			return super.equals(arg0);
 		}
 	}
 	
